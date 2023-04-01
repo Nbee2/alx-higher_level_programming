@@ -1,23 +1,31 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
-takes in a letter and sends a POST request to http://0.0.0.0:5000/search_user
-with the letter as a parameter
+Takes in a letter and sends a POST request to a search endpoint
+with the letter as a parameter.
 """
-if __name__=='__main__':
+if __name__ == '__main__':
     import requests
     from sys import argv
+
     if len(argv) == 2:
-        q = argv[1]
+        query = argv[1]
     else:
-        q = ""
-    r = requests.post('http://0.0.0.0:5000/search_user', data={'q': q})
+        query = ""
+
+    url = 'http://example.com/search'  # replace with your endpoint URL
     try:
-        r_dict = r.json()
-        id = r_dict.get('id')
-        name = r_dict.get('name')
-        if len(r_dict) == 0 or not id or not name:
+        response = requests.post(url, data={'q': query})
+        response.raise_for_status()  # raise an exception if the request failed
+
+        data = response.json()
+        result_id = data.get('id')
+        result_name = data.get('name')
+
+        if not data or not result_id or not result_name:
             print("No result")
         else:
-            print("[{}] {}".format(r_dict.get('id'), r_dict.get('name')))
-    except:
-        print("Not a valid JSON")
+            print(f"[{result_id}] {result_name}")
+    except (requests.exceptions.RequestException, ValueError):
+        print("Could not retrieve search results.")
+
+
